@@ -1,0 +1,6 @@
+MCP23S17		KEYWORD1
+PortExpanderSPI		KEYWORD1
+init			KEYWORD2
+setPortDirection	KEYWORD2
+readIO			KEYWORD2
+writeIO			KEYWORD2
