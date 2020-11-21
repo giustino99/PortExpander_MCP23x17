@@ -6,9 +6,12 @@ PortExpanderSPI		KEYWORD1
 ###########################################
 
 init			KEYWORD2
-setPortDirection	KEYWORD2
-readIO			KEYWORD2
-writeIO			KEYWORD2
+portMode		KEYWORD2
+pinMode			KEYWORD2
+readPort		KEYWORD2
+readPin			KEYWORD2
+writePort		KEYWORD2
+writePin		KEYWORD2
 
 ###########################################
 

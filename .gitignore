@@ -1,0 +1,7 @@
+﻿################################################################################
+# Il file gitignore è stato creato automaticamente da Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/MCP23S17/v16/Browse.VC.db-shm
+/.vs/MCP23S17/v16/Browse.VC.db-wal
+/.vs/MCP23S17/v16/Browse.VC.opendb

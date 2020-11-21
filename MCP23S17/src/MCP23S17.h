@@ -49,8 +49,8 @@
 
 /*
 	* Interrupt control register
-	* set: pin value compared to DEFVAL register pin
-	* clear: pin value compared to previous pin value
+	* set: pin value compared to DEFVAL register pin (interrupt on value)
+	* clear: pin value compared to previous pin value (interrupt on change)
 	*/
 #define _INTCON_ADDR[2][2] {{0x08, 0x04}, {0x09, 0x14}}
 
@@ -133,7 +133,10 @@
 #define E13	13
 #define E14	14
 #define E15	15
+
+
 namespace MCP23S17 {
+	// registerBank[<riga>][<colonna>], colonna = bank, riga = registro
 	const uint8_t registerBank[19][2] = {
 		{0x00, 0x00},
 		{0x01, 0x10},
@@ -170,17 +173,45 @@ namespace MCP23S17 {
 			void init(uint8_t CS, uint8_t addr);
 			void init(uint8_t CS);
 
-			void setPortDirection(uint8_t port, uint8_t dir);
-			//void setPortDirection(uint8_t port, uint8_t dir, uint8_t pullup);
-			void setPortDirection(uint8_t port, uint8_t bit, uint8_t dir);
+			void portMode(uint8_t port, uint8_t dir);
+			void portMode(uint8_t port, uint8_t dir, uint8_t pullup);
+			void pinMode(uint8_t pin, uint8_t mode);					// come il pinMode normale, usare OUTPUT/INPUT/INPUT_PULLUP
 
-			uint8_t readIO(uint8_t port);
-			bool readIO(uint8_t port, uint8_t bit);
+			uint8_t readPort(uint8_t port);
+			bool readPin(uint8_t pin);
 
-			void writeIO(uint8_t port, uint8_t value);
-			void writeIO(uint8_t port, uint8_t bit, bool val);
+			void writePort(uint8_t port, uint8_t value);
+			void writePin(uint8_t pin, uint8_t value);					// usare HIGH e LOW, quelli dell'ide normale
+	};
+
+	class PortExpanderI2C {
+		private:
+			uint8_t address;
+			uint8_t bank;
+
+			void write(uint8_t addr, uint8_t value);
+			uint8_t read(uint8_t addr);
+
+		public:
+			void init(uint8_t addr);
+			void init(uint8_t addr, bool seqAddr);
+
+			void portMode(uint8_t port, uint8_t dir);
+			void portMode(uint8_t port, uint8_t dir, uint8_t pullup);
+			void pinMode(uint8_t pin, uint8_t mode);
+
+			uint8_t readPort(uint8_t port);
+			bool readPin(uint8_t pin);
+
+			void writePort(uint8_t port, uint8_t value);
+			void writePin(uint8_t pin, uint8_t value);
 	};
 };
 
 #endif
+/*
+* polling: con seqop set in IOCON, dentro un while leggere/scrivere il registro ad ogni ciclo senza modificare CS, quando si esce dal while -> CS HIGH
+* 
+* 
+*/
 

@@ -59,64 +59,58 @@ void PortExpanderSPI::init(uint8_t CS) {
 	write(registerBank[9][0], config);
 }
 
-void PortExpanderSPI::setPortDirection(uint8_t port, uint8_t dir) {
+void PortExpanderSPI::portMode(uint8_t port, uint8_t dir) {
 	write(registerBank[port][bank], dir);
 }
 
-/*
-void PortExpanderSPI::setPortDirection(uint8_t port, uint8_t dir, uint8_t pullup) {
+void PortExpanderSPI::portMode(uint8_t port, uint8_t dir, uint8_t pullup) {
 	write(registerBank[port][bank], dir);
 	write(registerBank[port + 11][bank], pullup);
 }
-*/
 
-void PortExpanderSPI::setPortDirection(uint8_t port, uint8_t bit, uint8_t dir) {
-	uint8_t b = bit;
-	if (port == 1) {
-		b -= 8;
+void PortExpanderSPI::pinMode(uint8_t pin, uint8_t mode) {
+	uint8_t temp = read(registerBank[pin / 8][bank]);
+	switch (mode) {
+		case 0:			// INPUT
+			write(registerBank[pin / 8][bank], (temp | (0x01 << (pin % 8))));
+		break;
+
+		case 1:			// OUTPUT
+			write(registerBank[pin / 8][bank], (temp & (0xFE << (pin % 8))));
+		break;
+
+		case 2:			// INPUT_PULLUP
+			write(registerBank[pin / 8][bank], (temp & (0xFE << (pin % 8))));
+			temp = read(registerBank[(pin / 8) + 11][bank]);
+			write(registerBank[(pin / 8) + 11][bank], (temp | (0x01 << (pin % 8))));
+		break;
 	}
-	uint8_t temp = read(registerBank[port][bank]);
-	if (dir) {
-		temp |= (0x01 << b);
-	}
-	else {
-		temp &= (0xFE << b);
-	}
-	write(registerBank[port][bank], temp);
 }
 
-uint8_t PortExpanderSPI::readIO(uint8_t port) {
+uint8_t PortExpanderSPI::readPort(uint8_t port) {
 	return read(registerBank[port + 17][bank]);
 }
 
-bool PortExpanderSPI::readIO(uint8_t port, uint8_t bit) {
-	uint8_t b = bit;
-	if (port == 1) {
-		b -= 8;
-	}
-	if ((read(registerBank[port + 17][bank]) >> b) == 0x01) {
+bool PortExpanderSPI::readPin(uint8_t pin) {
+	if (((read(registerBank[(pin / 8) + 17][bank]) & (0x01 << (pin % 8))) >> (pin % 8)) == 0x01) {
 		return true;
 	}
 	return false;
 }
 
-void PortExpanderSPI::writeIO(uint8_t port, uint8_t value) {
+void PortExpanderSPI::writePort(uint8_t port, uint8_t value) {
 	write(registerBank[port + 17][bank], value);
 }
 
-void PortExpanderSPI::writeIO(uint8_t port, uint8_t bit, bool val) {
-	uint8_t b = bit;
-	if (port == 1) {
-		b -= 8;
-	}
-	uint8_t temp = read(registerBank[port + 17][bank]);
-	if (val) {
-		temp |= (0x01 << b);
+void PortExpanderSPI::writePin(uint8_t pin, uint8_t value) {
+	uint8_t temp = read(registerBank[(pin / 8) + 17][bank]);
+	if (value) {
+		temp |= (0x01 << (pin % 8));
 	}
 	else {
-		temp &= (0xFE << b);
+		temp &= (0xFE << (pin % 8));
 	}
-	write(registerBank[port + 17][bank], temp);
+	write(registerBank[(pin / 8) + 17][bank], temp);
 }
 
 
